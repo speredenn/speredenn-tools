@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Publish a whole folder of svg files in exported pdf files
+# git sha references OK
+# version: git-sha-tools
+
+for file in `ls *.svg`; do
+    gitdate=`git log -1 --format=format:'%ci' --abbrev-commit $file`
+    gitsha=`git log -1 --format=format:'%h' --abbrev-commit $file`
+    gitstatus=`git status | grep "$file" | wc -l`
+
+    # Test if the file as been modified since the last commit
+    if [ $gitstatus -eq 0 ]; then
+        # If no, and if the output file does not exist, create the file
+        filename="${file%.*}-$gitsha".pdf
+        if [ ! -f $filename ]; then
+            echo "$file > $filename"
+            sed "s/git-sha/$gitsha ($gitdate)/g" "$file" > "/tmp/$file"
+            inkscape -D -A "${file%.*}-$gitsha".pdf -f "/tmp/$file"
+        else
+            # Else, skip the process
+            echo "${file%.*}-$gitsha.pdf exists: skipping..."
+        fi
+    else
+        # If the file has been modified since the last commit, create the
+        # file every time the script is run, but append "dirty"
+        filename="${file%.*}-$gitsha-dirty".pdf
+        echo "$file > $filename"
+        sed "s/git-sha/$gitsha-dirty ($gitdate)/g" "$file" > "/tmp/$file"
+        inkscape -D -A "$filename" -f "/tmp/$file"
+    fi
+    rm -f /tmp/$file
+done
