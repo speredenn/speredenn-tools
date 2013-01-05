@@ -38,8 +38,6 @@ if [ $# -eq 0 ]; then
     
 else
 
-    # TODO: it would be better to use git show instead of a checkout
-    #       Problem: how to refer to the git root path?
     file=$1
     commit=$2
     curlocation=`pwd`
