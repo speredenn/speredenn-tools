@@ -36,4 +36,20 @@ if [ $@ -eq "" ]; then
         rm -f /tmp/$file
     done
     
+else
+
+    # TODO: it would be better to use git show instead of a checkout
+    #       Problem: how to refer to the git root path?
+    file=$1
+    commit=$2
+    git checkout $commit
+    gitdate=`git log -1 --format=format:'%ci' --abbrev-commit $file`
+    gitsha=`git log -1 --format=format:'%h' --abbrev-commit $file`
+    filename="${file%.*}-$gitsha".pdf
+    echo "$file > $filename"
+    sed "s/git-sha/$gitsha ($gitdate)/g" "$file" > "/tmp/$file"
+    inkscape -D -A "${file%.*}-$gitsha".pdf -f "/tmp/$file"
+    git checkout master
+    
 fi
+
