@@ -53,7 +53,7 @@ else
     echo "$file > $filename"
     sed "s/git-sha/$gitsha ($gitdate)/g" "/tmp/$file-tmp" > "/tmp/$file"
     inkscape -D -A "${file%.*}-$gitsha".pdf -f "/tmp/$file"
-    
+    rm -f "/tmp/$file" "/tmp/$file-tmp"
 fi
 
 # TODO: add help, add arguments parser, add get last version from master.
