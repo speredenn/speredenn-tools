@@ -1,3 +1,10 @@
+# tmp files
+*~
+*#
+.#*
+*.stamp
+auto/*
+
 *.py[cod]
 
 # C extensions
