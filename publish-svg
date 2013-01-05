@@ -56,3 +56,4 @@ else
     
 fi
 
+# TODO: add help, add arguments parser, add get last version from master.
