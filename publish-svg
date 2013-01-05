@@ -4,7 +4,7 @@
 # git sha references OK
 # version: git-sha-tools
 
-if [ $@ -eq "" ]; then
+if [ $# -eq 0 ]; then
     
     for file in `ls *.svg`; do
         gitdate=`git log -1 --format=format:'%ci' --abbrev-commit $file`
@@ -42,14 +42,19 @@ else
     #       Problem: how to refer to the git root path?
     file=$1
     commit=$2
-    git checkout $commit
-    gitdate=`git log -1 --format=format:'%ci' --abbrev-commit $file`
-    gitsha=`git log -1 --format=format:'%h' --abbrev-commit $file`
+    curlocation=`pwd`
+    # Find the root of the current git repository
+    while [ ! -d .git ] && [ ! `pwd` = "/" ]; do cd ..; done
+    gitrepolocation=`pwd`
+    cd $curlocation
+    filegitpath=${curlocation#"$gitrepolocation/"}/$file
+    git show $commit:"$filegitpath" > "/tmp/$file-tmp"
+    gitdate=`git log -1 --format=format:'%ci' --abbrev-commit $commit`
+    gitsha=`git log -1 --format=format:'%h' --abbrev-commit $commit`
     filename="${file%.*}-$gitsha".pdf
     echo "$file > $filename"
-    sed "s/git-sha/$gitsha ($gitdate)/g" "$file" > "/tmp/$file"
+    sed "s/git-sha/$gitsha ($gitdate)/g" "/tmp/$file-tmp" > "/tmp/$file"
     inkscape -D -A "${file%.*}-$gitsha".pdf -f "/tmp/$file"
-    git checkout master
     
 fi
 
