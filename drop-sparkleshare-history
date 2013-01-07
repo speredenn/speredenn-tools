@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# script downloaded on  http://pastebin.com/PXYFJSGL
+# from: Kevin Pinte (https://github.com/bomma),
+# based on: https://github.com/pangloss/gibak
+# original licence: free software (GPL 2)
+
+
 function prune() {
     
     local time_spec="30 days ago"
