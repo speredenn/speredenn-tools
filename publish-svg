@@ -4,14 +4,74 @@
 # git sha references OK
 # version: git-sha-tools
 
+usage()
+{
+cat << EOF
+usage: $0 options
+
+This script exports SVG files as PDF files. It also references the version of
+the file with its git sha and date, if it find the tag "git-sha" in the SVG
+file.
+
+OPTIONS:
+   -h      Show this message
+   -c      Commit SHA
+   -r      Recussive
+EOF
+}
+
+commit=
+recussive="no"
+
+while getopts “hc:r” option
+do
+     case $option in
+         h)
+             usage
+             exit 1
+             ;;
+         c)
+             commit=$OPTARG
+             ;;
+         r)
+             recussive="yes"
+             ;;
+         ?)
+             usage
+             exit
+             ;;
+     esac
+done
+
+if [[ -c $commit ]] || [[ -r $recurssive ]]
+then
+     usage
+     exit 1
+fi
+
+curpath=`pwd`
+
+# if there is no argument: then, we are in folder-mode
+# else, we test if the input is a folder of a file
 if [ $# -eq 0 ]; then
-    
+    mode="folder"
+    path="./"
+else
+    if [ -d "$1" ]; then
+        mode="folder"
+    else
+        mode="file"
+    fi
+    path="$1"
+fi
+
+if [ $mode == "folder" ]; then
+    cd $path
     for file in `ls *.svg`; do
         gitdate=`git log -1 --format=format:'%ci' --abbrev-commit $file`
         gitsha=`git log -1 --format=format:'%h' --abbrev-commit $file`
         gitstatus=`git status | grep "$file" | wc -l`
         lastmod=`stat -c --format=%y $file`
-
         # Test if the file as been modified since the last commit
         if [ $gitstatus -eq 0 ]; then
             # If no, and if the output file does not exist, create the file
@@ -32,12 +92,12 @@ if [ $# -eq 0 ]; then
             sed "s/git-sha/$gitsha-dirty ($lastmod)/g" "$file" > "/tmp/$file"
             inkscape -D -A "$filename" -f "/tmp/$file"
         fi
-        
         rm -f /tmp/$file
     done
-    
-else
-
+    cd $curpath
+else # if mode is file
+    folderpath=`dirname $path`
+    cd $folderpath
     file=$1
     commit=$2
     curlocation=`pwd`
@@ -54,6 +114,7 @@ else
     sed "s/git-sha/$gitsha ($gitdate)/g" "/tmp/$file-tmp" > "/tmp/$file"
     inkscape -D -A "${file%.*}-$gitsha".pdf -f "/tmp/$file"
     rm -f "/tmp/$file" "/tmp/$file-tmp"
+    cd $curpath
 fi
 
 # TODO: add help, add arguments parser, add get last version from master.
