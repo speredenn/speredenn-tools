@@ -10,7 +10,7 @@ if [ $# -eq 0 ]; then
         gitdate=`git log -1 --format=format:'%ci' --abbrev-commit $file`
         gitsha=`git log -1 --format=format:'%h' --abbrev-commit $file`
         gitstatus=`git status | grep "$file" | wc -l`
-        lastmod=`stat -c %y $tool`
+        lastmod=`stat -c --format=%y $file`
 
         # Test if the file as been modified since the last commit
         if [ $gitstatus -eq 0 ]; then
