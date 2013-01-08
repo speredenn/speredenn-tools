@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="744.09448"
+   height="1052.3622"
+   id="svg3280">
+  <defs
+     id="defs3282" />
+  <metadata
+     id="metadata3285">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1">
+    <rect
+       width="320"
+       height="260"
+       x="260"
+       y="92.362183"
+       id="rect3319"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.92296076;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    <text
+       x="525"
+       y="142.36218"
+       id="text3249"
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:125%;letter-spacing:0px;word-spacing:0px;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Liberation Serif;-inkscape-font-specification:Liberation Serif"><tspan
+         x="525"
+         y="142.36218"
+         id="tspan3251"
+         style="font-size:12px;text-align:end;text-anchor:end"><tspan
+           id="tspan3255"
+           style="font-size:12px;text-align:end;text-anchor:end;fill:#999999">ref.:</tspan><tspan
+           id="tspan3253"
+           style="font-size:12px;text-align:end;text-anchor:end;fill:#333333"> git-sha</tspan></tspan></text>
+    <g
+       id="g3305"
+       style="fill:#4d4d4d;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0">
+      <path
+         d="m 496.57652,283.05658 28.5829,-25.79817 0,44.64841 -28.5829,23.07554 z"
+         id="path3317"
+         style="fill:#e9e9ff;fill-rule:evenodd;stroke:none" />
+      <path
+         d="m 430,196.0394 0,51.1092 66.57652,77.83376 0,-41.92578 z"
+         id="path3307"
+         style="fill:#353564;fill-rule:evenodd;stroke:none" />
+      <path
+         d="m 430,196.0394 30,-38.8908 65.15942,100.10981 -28.5829,25.79817 z"
+         id="path3309"
+         style="fill:#4d4d9f;fill-rule:evenodd;stroke:none" />
+      <path
+         d="m 430,247.1486 30,-34.78642 65.15942,89.54464 -28.5829,23.07554 z"
+         id="path3315"
+         style="fill:#afafde;fill-rule:evenodd;stroke:none" />
+      <path
+         d="m 460,157.1486 0,55.21358 65.15942,89.54464 0,-44.64841 z"
+         id="path3313"
+         style="fill:#d7d7ff;fill-rule:evenodd;stroke:none" />
+      <path
+         d="m 430,196.0394 30,-38.8908 0,55.21358 -30,34.78642 z"
+         id="path3311"
+         style="fill:#8686bf;fill-rule:evenodd;stroke:none" />
+    </g>
+  </g>
+</svg>
