@@ -4,12 +4,14 @@
 # git sha references OK
 # version: git-sha-tools
 
+# path where we are when the script is called
+orgpath=`pwd`
 
-curpath=`pwd`
-
+# initialize options
 recursivemode=
 commitmode=
 
+# read options
 while getopts rc: name; do
     case $name in
         r) recursivemode=1;;
@@ -32,20 +34,74 @@ fi
 shift $(($OPTIND - 1))
 paths=$*
 
+# if no path is given, path is the current path
+if [ -z "$paths" ]; then
+    paths="$orgpath"
+fi
+
 # for every given path, export the files
 for path in $paths; do
     # test if the given path is a folder path or a file path
+    # and affect the folderpath variable
     if [ -d $path ]; then
         # we're in folder mode
-        folderpath=$path
-        echo $folderpath
+        mode="folder"
     else
         # we're in file mode
-        folderpath=`dirname "$path"`
-        echo $folderpath
+        mode="file"
     fi
-done
+    
+    if [ $mode == "folder" ]; then
+        # if the recursive-mode is on, find all the SVG files recursively
+        cd $path
+        if [ ! -z "$recursivemode" ]; then
+            filepaths=`find -L -iname "*.svg" -print`
+        else # else, find then only in the current folder
+            filepaths=`find -L -maxdepth 1 -iname "*.svg" -print`
+        fi
+        cd $orgpath
+    else # file mode
+        filepaths=$path
+    fi
 
+    for filepath in $filepaths; do
+        if [ $mode == "folder" ]; then
+            folderpath=$path
+        else
+            folderpath=`dirname "$filepath"`
+        fi
+        filename="${filepath##*/}"
+        cd $folderpath
+        gitdate=`git log -1 --format=format:'%ci' --abbrev-commit "$filename"`
+        gitsha=`git log -1 --format=format:'%h' --abbrev-commit "$filename"`
+        gitstatus=`git status | grep "$filename" | wc -l`
+        lastmod=`stat -c --format=%y "$filename"`
+        
+        # Test if the file as been modified since the last commit
+        if [ $gitstatus -eq 0 ]; then
+            # If no, and if the output file does not exist, create the file
+            newfilename="${filename%.*}-$gitsha".pdf
+            if [ ! -f $newfilename ]; then
+                echo "$filename > $newfilename"
+                sed "s/git-sha/$gitsha ($gitdate)/g" "$filename" > "/tmp/$filename"
+                inkscape -D -A "$newfilename" -f "/tmp/$filename"
+            else
+                # Else, skip the process
+                echo "$newfilename exists: skipping..."
+            fi
+        else
+            # If the file has been modified since the last commit, create the
+            # file every time the script is run, but append "dirty"
+            newfilename="${filename%.*}-$gitsha-dirty".pdf
+            echo "$filename > $newfilename"
+            sed "s/git-sha/$gitsha-dirty ($lastmod)/g" "$filename" > "/tmp/$filename"
+            inkscape -D -A "$newfilename" -f "/tmp/$filename"
+        fi
+        rm -f /tmp/$filename
+        cd $orgpath
+    done
+done
+cd $orgpath
 exit
 
 
