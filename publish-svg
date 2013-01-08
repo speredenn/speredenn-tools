@@ -4,52 +4,93 @@
 # git sha references OK
 # version: git-sha-tools
 
-usage()
-{
-cat << EOF
-usage: $0 options
-
-This script exports SVG files as PDF files. It also references the version of
-the file with its git sha and date, if it find the tag "git-sha" in the SVG
-file.
-
-OPTIONS:
-   -h      Show this message
-   -c      Commit SHA
-   -r      Recussive
-EOF
-}
-
-commit=
-recussive="no"
-
-while getopts “hc:r” option
-do
-     case $option in
-         h)
-             usage
-             exit 1
-             ;;
-         c)
-             commit=$OPTARG
-             ;;
-         r)
-             recussive="yes"
-             ;;
-         ?)
-             usage
-             exit
-             ;;
-     esac
-done
-
-if [[ -c $commit ]] || [[ -r $recurssive ]]
-then
-     usage
-     exit 1
-fi
 
 curpath=`pwd`
+
+recursivemode=
+commitmode=
+
+while getopts rc: name; do
+    case $name in
+        r) recursivemode=1;;
+        c) commitmode=1
+            commit="$OPTARG";;
+        ?) printf "Usage: %s: [-r] [-c commit-hash] file(s)-or-folder-path\n" $0
+            exit 2;;
+    esac
+done
+
+# if the commit-mode is on, revert to the specified commit for export
+if [ ! -z "$commitmode" ]; then
+    printf 'Option -c "%s" specified\n' "$commit"
+else # else take the last file version or commit
+    printf "Option -c not specified\n"
+fi
+
+# what remains after those arguments should the one or more files
+# or folder paths.
+shift $(($OPTIND - 1))
+paths=$*
+
+# for every given path, export the files
+for path in $paths; do
+    # test if the given path is a folder path or a file path
+    if [ -d $path ]; then
+        # we're in folder mode
+        folderpath=$path
+        echo $folderpath
+    else
+        # we're in file mode
+        folderpath=`dirname "$path"`
+        echo $folderpath
+    fi
+done
+
+exit
+
+
+
+
+
+# test if path is a file path or a directory path
+# as there might be many paths given, we test the first one
+if [ -d ${path[0]} ]
+    printf "The given path is a directory.\n"
+else
+    printf "We're in file mode\n"
+
+# if no path is given, take current folder
+if [ $path == "" ]; then
+    path=$curpath
+fi
+cd $path
+
+if [ -d $path ]; then # if the given path is a directory path
+    # if the recursive-mode is on, find all the SVG files recursively
+    if [ ! -z "$recursivemode" ]; then
+        printf "Option -r specified\n"
+        files=`find -L -iname *.svg -print0`
+    else # else, find then only in the current folder
+        printf "Option -r not specified\n"
+        files=`find -L -maxdepth 1 -iname *.svg -print0`
+    fi
+else # else, if that must be one or more files
+    files=$path
+fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # if there is no argument: then, we are in folder-mode
 # else, we test if the input is a folder of a file
