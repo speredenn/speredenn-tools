@@ -66,7 +66,7 @@ for path in $paths; do
 
     for filepath in $filepaths; do
         if [ $mode == "folder" ]; then
-            folderpath=$path
+            folderpath=$path # not working in every case :-(
         else
             folderpath=`dirname "$filepath"`
         fi
@@ -76,6 +76,9 @@ for path in $paths; do
         gitsha=`git log -1 --format=format:'%h' --abbrev-commit "$filename"`
         gitstatus=`git status | grep "$filename" | wc -l`
         lastmod=`stat -c --format=%y "$filename"`
+
+        if [ -z $commitmode]; then
+        git show $commit:"$filegitpath" > "/tmp/$file-tmp"
         
         # Test if the file as been modified since the last commit
         if [ $gitstatus -eq 0 ]; then
@@ -108,31 +111,6 @@ exit
 
 
 
-# test if path is a file path or a directory path
-# as there might be many paths given, we test the first one
-if [ -d ${path[0]} ]
-    printf "The given path is a directory.\n"
-else
-    printf "We're in file mode\n"
-
-# if no path is given, take current folder
-if [ $path == "" ]; then
-    path=$curpath
-fi
-cd $path
-
-if [ -d $path ]; then # if the given path is a directory path
-    # if the recursive-mode is on, find all the SVG files recursively
-    if [ ! -z "$recursivemode" ]; then
-        printf "Option -r specified\n"
-        files=`find -L -iname *.svg -print0`
-    else # else, find then only in the current folder
-        printf "Option -r not specified\n"
-        files=`find -L -maxdepth 1 -iname *.svg -print0`
-    fi
-else # else, if that must be one or more files
-    files=$path
-fi
 
 
 
@@ -144,54 +122,6 @@ fi
 
 
 
-
-
-
-
-# if there is no argument: then, we are in folder-mode
-# else, we test if the input is a folder of a file
-if [ $# -eq 0 ]; then
-    mode="folder"
-    path="./"
-else
-    if [ -d "$1" ]; then
-        mode="folder"
-    else
-        mode="file"
-    fi
-    path="$1"
-fi
-
-if [ $mode == "folder" ]; then
-    cd $path
-    for file in `ls *.svg`; do
-        gitdate=`git log -1 --format=format:'%ci' --abbrev-commit $file`
-        gitsha=`git log -1 --format=format:'%h' --abbrev-commit $file`
-        gitstatus=`git status | grep "$file" | wc -l`
-        lastmod=`stat -c --format=%y $file`
-        # Test if the file as been modified since the last commit
-        if [ $gitstatus -eq 0 ]; then
-            # If no, and if the output file does not exist, create the file
-            filename="${file%.*}-$gitsha".pdf
-            if [ ! -f $filename ]; then
-                echo "$file > $filename"
-                sed "s/git-sha/$gitsha ($gitdate)/g" "$file" > "/tmp/$file"
-                inkscape -D -A "${file%.*}-$gitsha".pdf -f "/tmp/$file"
-            else
-                # Else, skip the process
-                echo "${file%.*}-$gitsha.pdf exists: skipping..."
-            fi
-        else
-            # If the file has been modified since the last commit, create the
-            # file every time the script is run, but append "dirty"
-            filename="${file%.*}-$gitsha-dirty".pdf
-            echo "$file > $filename"
-            sed "s/git-sha/$gitsha-dirty ($lastmod)/g" "$file" > "/tmp/$file"
-            inkscape -D -A "$filename" -f "/tmp/$file"
-        fi
-        rm -f /tmp/$file
-    done
-    cd $curpath
 else # if mode is file
     folderpath=`dirname $path`
     cd $folderpath

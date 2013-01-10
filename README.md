@@ -9,6 +9,6 @@ To install the scripts in their last version in ~/bin:
 
 The repository contains:
 
-* publish-svg: a bash script that exports SVG files in PDF referencing
+* publish-it: a bash script that exports documents in PDF referencing
   them with their git commit sha and date.
 * More to come...
