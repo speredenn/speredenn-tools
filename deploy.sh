@@ -3,7 +3,7 @@
 # TODO: write git sha in the comments in the tools and cp in ~/bin
 # This is the deployment script
 
-toolslist=`grep -rl "version: git-sha-tag" | xargs grep -L "This is
+toolslist=`grep -rl "Version: git-sha-tag" | xargs grep -L "This is
 the deployment script"`
 
 for tool in $toolslist; do
