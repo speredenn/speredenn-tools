@@ -18,8 +18,9 @@ source ~/.keychain/$HOSTNAME-sh
 
 function help_msg {
     echo "USAGE: org-anx <annex> <action>"
-    echo "Known annexes: gwynn, lenimac15, galaad."
+    echo "Known annexes: gwynn, gaheris, lenimac15, galaad."
     echo "Possible actions: watch, unwatch, sync"
+    exit 1
 }
 
 # Set annexes path, according to user's choice
