@@ -8,6 +8,119 @@
 # version 3 of the License, or (at your option) any later version.
 #
 
+function is_git_repo {
+    # USAGE: is_git_repo <path>
+    if [ -d "$1" ]; then
+        git_repo_test=$(find "$1" -maxdepth 1 -type d -name .git | wc -l)
+        if [[ $git_repo_test -eq 1 ]]; then
+            echo "1"
+        else
+            echo "0"
+        fi
+    else
+        echo "0"
+    fi
+}
+
+function is_git_annex_repo {
+    # USAGE: is_git_annex_repo <path>
+    if [[ $(is_git_repo $1) -eq 1 ]]; then
+        git_annex_repo_test=$(find "$1"/.git -maxdepth 1 -type d \
+            -name annex | wc -l)
+        if [[ $git_annex_repo_test -eq 1 ]]; then
+            echo "1"
+        else
+            echo "0"
+        fi
+    else
+        echo "0"
+    fi
+}
+
+
+function git_get_sha {
+    # USAGE: git_get_sha <repo_path>
+    if [[ $(is_git_repo "$1") -eq 1 ]]; then
+        git_sha=$(git log -1 --format=format:'%h' --abbrev-commit)
+        echo $git_sha
+    else
+        echo "$1 is not a git repository. Exiting..."
+        exit 1
+    fi
+}
+
+function git_get_date {
+    # USAGE: git_get_date <repo_path>
+    if [[ $(is_git_repo "$1") -eq 1 ]]; then
+        git_date=$(date -d "$(git log -1 --format=format:'%ci' \
+            --abbrev-commit)" +%Y-%m-%d)
+        echo $git_date
+    else
+        echo "$1 is not a git repository. Exiting..."
+        exit 1
+    fi
+}
+    
+function publish_git_repo {
+    # USAGE: publish_git_repo <repo_path> <commit>
+    
+    if [ "$1" == "" ]; then
+        repo_path="./"
+    else
+        repo_path="$1"
+    fi
+    
+    if [ "$2" == "" ]; then
+        commit="HEAD"
+    else
+        commit="$2"
+    fi
+    
+    cur_location=$(pwd)
+    cd $repo_path
+    
+    cur_branch_name=$(git branch | grep "*" | cut -f 2 -d " ")
+    git checkout --detach "$2" &> /dev/null
+    gitsha=$(git_get_sha "$1")
+    gitdate=$(git_get_date "$1")
+    echo "git checkout - detached head @$gitsha"
+    new_dir_name=$gitdate-$(basename $repo_path)-$gitsha
+    
+    echo "Preparing the archive..."
+    tar -cf /tmp/$new_dir_name.tar --dereference --exclude-vcs \
+        --exclude-backups ./ &> /dev/null
+    rm -Rf /tmp/$new_dir_name
+    mkdir /tmp/$new_dir_name
+    tar -C /tmp/$new_dir_name -xf /tmp/$new_dir_name.tar &> /dev/null
+    rm -f /tmp/$new_dir_name.tar
+    cd /tmp/$new_dir_name
+    find . -type d -empty -delete
+    rm -f .git*
+    cd ..
+    tar -czf "$repo_path/../$new_dir_name.tar.gz" "./$new_dir_name" &> /dev/null
+    rm -Rf $new_dir_name
+    cd $repo_path/../
+    echo "Archive ready at $(pwd)/$new_dir_name.tar.gz"
+    tar -tzf $(pwd)/$new_dir_name.tar.gz
+    cd $repo_path
+    git checkout $cur_branch_name
+    cd $cur_location
+    
+}
+
+
+source="$1"
+org_path=$(pwd)
+
+
+publish_git_repo $1 $2
+
+
+
+
+
+exit 1
+
 # path where we are when the script is called
 orgpath=`pwd`
 
