@@ -1,8 +1,12 @@
 #!/bin/bash
-
+# Copyright (c) 2013 Jean-Baptiste Carré <jbc@0x1d.org>.
+# Version: git-sha-tag
+#
 # Publish a whole folder of svg files in exported pdf files
-# git sha references OK
-# version: git-sha-tools
+#
+# This code is licensed under the GNU General Public License, either
+# version 3 of the License, or (at your option) any later version.
+#
 
 if [ $# -eq 0 ]; then
     
@@ -14,22 +18,27 @@ if [ $# -eq 0 ]; then
 
         # Test if the file as been modified since the last commit
         if [ $gitstatus -eq 0 ]; then
-            # If no, and if the output file does not exist, create the file
+            # If no, and if the output file does not exist, create the
+            # file
             filename="${file%.*}-$gitsha".pdf
             if [ ! -f $filename ]; then
                 echo "$file > $filename"
-                sed "s/git-sha/$gitsha ($gitdate)/g" "$file" > "/tmp/$file"
-                inkscape -D -A "${file%.*}-$gitsha".pdf -f "/tmp/$file"
+                sed "s/git-sha/$gitsha ($gitdate)/g" "$file" \
+                    > "/tmp/$file"
+                inkscape -D -A "${file%.*}-$gitsha".pdf \
+                    -f "/tmp/$file"
             else
                 # Else, skip the process
                 echo "${file%.*}-$gitsha.pdf exists: skipping..."
             fi
         else
-            # If the file has been modified since the last commit, create the
-            # file every time the script is run, but append "dirty"
+            # If the file has been modified since the last commit,
+            # create the file every time the script is run, but append
+            # "dirty"
             filename="${file%.*}-$gitsha-dirty".pdf
             echo "$file > $filename"
-            sed "s/git-sha/$gitsha-dirty ($lastmod)/g" "$file" > "/tmp/$file"
+            sed "s/git-sha/$gitsha-dirty ($lastmod)/g" "$file" \
+                > "/tmp/$file"
             inkscape -D -A "$filename" -f "/tmp/$file"
         fi
         
