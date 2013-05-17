@@ -2,7 +2,7 @@
 
 # Publish a whole folder of svg files in exported pdf files
 # git sha references OK
-# version: git-sha-tools
+# version: git-sha-tag
 
 # path where we are when the script is called
 orgpath=`pwd`
@@ -106,17 +106,6 @@ for path in $paths; do
 done
 cd $orgpath
 exit
-
-
-
-
-
-
-
-
-
-
-
 
 
 

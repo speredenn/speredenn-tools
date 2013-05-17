@@ -1,0 +1,56 @@
+#!/bin/bash
+# Copyright (c) 2013 Jean-Baptiste Carré <jbc@0x1d.org>.
+# Version: git-sha-tag
+#
+# This script backs up a source directory into an other one.  It
+# doesn't work for ssh locations, as the tests need to be written
+# differently in that case.
+# ie: if (ssh username@ssh_server '[ -d /directory ]')...
+#
+# This code is licensed under the GNU General Public License, either
+# version 3 of the License, or (at your option) any later version.
+#
+
+function help_msg {
+    echo "USAGE: bkp-dir <source> <aim>"
+    exit 1
+}
+
+# Check that there are arguments and display help
+if [ "$1" == "" -o "$1" == "-h" -o "$1" == "--help" ]; then
+    help_msg
+fi
+
+if [ "$2" == "" ]; then
+    help_msg
+fi
+
+# Variable affectations
+source=$1
+aim=$2
+log="$HOME/log/backup.log"
+
+# Check that aim directory is writable. If it doesn't exist, create it
+if [ ! -d $aim ]; then
+    echo "$aim doesn't exist. Creating directory..."
+    mkdir -p $aim
+fi
+
+if [[ $(stat --format=%a $aim | cut -c1) -gt "6" ]]; then
+    echo "$aim is writable."
+else
+    echo "$aim is not writable. Existing..."
+    exit 1
+fi
+
+# Create log directory, if it doesn't exist
+logdir=$(dirname $log)
+if [ ! -d $logdir ]; then
+    echo "$logdir doesn't exist. Creating it..."
+    mkdir -p $logdir
+fi
+
+# backup
+echo -e "$(date "+%Y/%m/%d %H:%M:%S"): backup from $source to $aim is starting...\n" | tee -a $log
+rsync -azvch --stats --progress --delete-after "$source/" "$aim" | tee -a $log
+echo -e "$(date "+%Y/%m/%d %H:%M:%S"): backup from $source to $aim is finished.\n\n" | tee -a $log

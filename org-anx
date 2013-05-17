@@ -1,0 +1,88 @@
+#!/bin/bash
+# Copyright (c) 2013 Jean-Baptiste Carré <jbc@0x1d.org>.
+# Version: git-sha-tag
+#
+# This script allows me to administrate easily my git annex
+# repositories.
+#
+# This code is licensed under the GNU General Public License, either
+# version 3 of the License, or (at your option) any later version.
+#
+
+# Load keychain
+
+keychain ~/.ssh/id_rsa
+source ~/.keychain/$HOSTNAME-sh
+
+# Some basic functions
+
+function help_msg {
+    echo "USAGE: org-anx <annex> <action>"
+    echo "Known annexes: gwynn, lenimac15, galaad."
+    echo "Possible actions: watch, unwatch, sync"
+}
+
+# Set annexes path, according to user's choice
+
+case "$1" in
+    
+    gwynn)
+        anx_path=/mnt/gwynn/anx/
+        ;;
+
+    gaheris)
+        anx_path=/media/gaheris/anx/
+        ;;
+    
+    lenimac15)
+        anx_path=/home/carre/anx/
+        ;;
+    
+    galaad)
+        anx_path=/home/speredenn/data/anx/
+        ;;
+    
+    *)
+        help_msg   
+esac
+
+# Action!
+
+cd $anx_path
+
+for cur_annex in $(ls $anx_path)
+do
+    cd $cur_annex
+    echo "Current annex: $cur_annex..."
+    if [ $(git annex status | wc -l) -eq "0" ]; then
+        action="none"
+    else
+        action="$2"
+    fi
+
+    case "$2" in
+
+        watch)
+            echo "Start watching..."
+            git annex watch
+            ;;
+        
+        unwatch)
+            echo "Stop watching..."
+            git annex watch --stop
+            ;;
+        
+        sync)
+            echo "Syncing..."
+            git annex sync
+            git annex sync
+            ;;
+        
+        *)
+            help_msg
+    esac
+
+    cd $anx_path
+
+done
+

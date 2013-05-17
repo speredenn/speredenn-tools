@@ -3,7 +3,8 @@
 # TODO: write git sha in the comments in the tools and cp in ~/bin
 # This is the deployment script
 
-toolslist=`grep -rl "version: git-sha-tools" | xargs grep -L "This is the deployment script"`
+toolslist=`grep -rl "version: git-sha-tag" | xargs grep -L "This is
+the deployment script"`
 
 for tool in $toolslist; do
 
@@ -19,7 +20,7 @@ for tool in $toolslist; do
     fi
 
     rm -f "~/bin/$tool"
-    sed "s/git-sha-tools/$gitshatool/g" ./"$tool" > "$HOME/bin/$tool"
+    sed "s/git-sha-tag/$gitshatool/g" ./"$tool" > "$HOME/bin/$tool"
     chmod +x "$HOME/bin/$tool"
     
 done
