@@ -68,15 +68,15 @@ function publish_git_repo {
     # be archive is stored locally before running the publish command.
  
     if [ "$1" == "" ]; then
-        repo_path="./"
-    else
-        repo_path="$1"
-    fi
-    
-    if [ "$2" == "" ]; then
+        repo_path="$(pwd)"
         commit="HEAD"
     else
-        commit="$2"
+        repo_path="$1"
+        if [ "$2" == "" ]; then
+            commit="HEAD"
+        else
+            commit="$2"
+        fi
     fi
 
     # Get current location and branch
@@ -94,14 +94,14 @@ function publish_git_repo {
     fi
     
     # Switch to the desired version
-    git checkout --detach "$2" &> /dev/null
+    git checkout --detach "$commit" &> /dev/null
 
     # Get the needed parameters
-    gitsha=$(git_get_sha "$1")
-    gitdate=$(git_get_date "$1")
+    gitsha=$(git_get_sha "$repo_path")
+    gitdate=$(git_get_date "$repo_path")
     echo "git checkout - detached head @$gitsha"
     new_dir_name=$gitdate-$(basename $repo_path)-$gitsha
-
+    
     # Prepare the archive
     # We tar once first to get rid of the files not present in the annex.
     # Then, we tar+gzip the real archive (without empty folders, so - see find
@@ -135,10 +135,6 @@ function publish_git_repo {
     cd $cur_location
     
 }
-
-
-source="$1"
-org_path=$(pwd)
 
 
 publish_git_repo $1 $2
