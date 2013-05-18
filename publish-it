@@ -63,7 +63,10 @@ function git_get_date {
     
 function publish_git_repo {
     # USAGE: publish_git_repo <repo_path> <commit>
-    
+    # It works for git and git-annex repositories.
+    # For git-annex repositories, be sure that the needed content to
+    # be archive is stored locally before running the publish command.
+ 
     if [ "$1" == "" ]; then
         repo_path="./"
     else
@@ -75,17 +78,34 @@ function publish_git_repo {
     else
         commit="$2"
     fi
-    
+
+    # Get current location and branch
     cur_location=$(pwd)
     cd $repo_path
-    
     cur_branch_name=$(git branch | grep "*" | cut -f 2 -d " ")
+
+    # Detect a dirty repository and stop the process if needed
+    is_clean=$(git status | \
+        grep "nothing to commit (working directory clean)" | wc -l)
+    
+    if [[ $is_clean -eq 0 ]]; then
+        echo "This repository is dirty. Please commit or stash your work before using the publish command."
+        exit 1
+    fi
+    
+    # Switch to the desired version
     git checkout --detach "$2" &> /dev/null
+
+    # Get the needed parameters
     gitsha=$(git_get_sha "$1")
     gitdate=$(git_get_date "$1")
     echo "git checkout - detached head @$gitsha"
     new_dir_name=$gitdate-$(basename $repo_path)-$gitsha
-    
+
+    # Prepare the archive
+    # We tar once first to get rid of the files not present in the annex.
+    # Then, we tar+gzip the real archive (without empty folders, so - see find
+    # command).
     echo "Preparing the archive..."
     tar -cf /tmp/$new_dir_name.tar --dereference --exclude-vcs \
         --exclude-backups ./ &> /dev/null
@@ -96,12 +116,20 @@ function publish_git_repo {
     cd /tmp/$new_dir_name
     find . -type d -empty -delete
     rm -f .git*
+
+    # Make the archive
     cd ..
     tar -czf "$repo_path/../$new_dir_name.tar.gz" "./$new_dir_name" &> /dev/null
     rm -Rf $new_dir_name
     cd $repo_path/../
     echo "Archive ready at $(pwd)/$new_dir_name.tar.gz"
+
+    # List the archive on the standard output; it helps to figure out if
+    # something has been forgotten by the user.
     tar -tzf $(pwd)/$new_dir_name.tar.gz
+
+    # Reset the archive at its state before the command and go back where we
+    # were at the beginning.
     cd $repo_path
     git checkout $cur_branch_name
     cd $cur_location
