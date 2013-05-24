@@ -2,7 +2,7 @@
 # Copyright (c) 2013 Jean-Baptiste Carré <jbc@0x1d.org>.
 # Version: git-sha-tag
 #
-# Publish a whole folder of svg files in exported pdf files
+# Publish files and folders for use or export.
 #
 # This code is licensed under the GNU General Public License, either
 # version 3 of the License, or (at your option) any later version.
