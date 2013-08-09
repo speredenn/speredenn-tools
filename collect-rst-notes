@@ -1,0 +1,37 @@
+#!/bin/bash
+# Copyright (c) 2013 Jean-Baptiste Carré <jbc@0x1d.org>.
+# Version: git-sha-tag
+
+annex_path="$HOME/annex"
+deft_folder="_deft"
+notes_ext="rst"
+
+if [ ! -e $annex_path ]; then
+    echo "$annex_path doesn't exist. Exiting..."
+    exit 0
+fi
+
+if [ ! -e $annex_path/$deft_folder ]; then
+    echo "Folder $deft_folder doesn't exist."
+    mkdir -p $annex_path/$deft_folder
+    echo "Folder $deft_folder created."
+fi
+
+cd $annex_path
+
+for new_note in $( ls $annex_path/$deft_folder/deft-*.$notes_ext ); do
+    mv $new_note $annex_path/
+done
+
+rm -f $annex_path/$deft_folder/*.$notes_ext
+
+files_list=$( find . -type f -name "*.$notes_ext" )
+
+for file in $files_list; do
+    cfilename=$( basename $file )
+    echo "Linking $cfilename ..."
+    random_id=$( date | md5sum | cut -c 2-8 )
+    extension="${cfilename##*.}"
+    filename="${cfilename%.*}"
+    ln -s $annex_path/$file $annex_path/$deft_folder/$filename-$random_id.$extension
+done

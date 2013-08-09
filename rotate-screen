@@ -1,0 +1,15 @@
+#!/bin/bash
+# Copyright (c) 2013 Jean-Baptiste Carré <jbc@0x1d.org>.
+# Version: git-sha-tag
+
+rotation=$(xrandr -q | grep "inverted (" | wc -l)
+
+if [[ $rotation -eq 1 ]] ; then
+    xrandr -o normal
+else
+    xrandr -o inverted
+fi
+
+
+
+
